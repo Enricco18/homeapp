@@ -6,7 +6,15 @@ import Link from 'next/link'
 import { createApi } from '@/lib/api'
 import { STORE_LABELS, type GroceryItemResponse, type HomeResponse, type ItemResponse, type QuickMessageResponse, type Store } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Plus, Trash2, ShoppingCart, CheckCircle2, Circle, Settings, Package, Users, MessageCircle, Send } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, ShoppingCart, CheckCircle2, Circle, Settings, Package, Users, Send } from 'lucide-react'
+import type { UserResponse } from '@/lib/types'
+
+function getInitials(author: UserResponse): string {
+  const name = author.fullName || author.username || author.email || ''
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.slice(0, 2).toUpperCase() || '?'
+}
 import ScrambledText from '@/components/ScrambledText'
 import TextType from '@/components/TextType'
 
@@ -244,7 +252,16 @@ export default function HomeDetailClient({ homeId }: { homeId: number }) {
       </div>
 
       <div className="bg-white border rounded-xl px-5 py-4 shadow-sm mb-6 flex items-center gap-4">
-        <MessageCircle className="size-4 text-zinc-400 shrink-0" />
+        {quickMessage ? (
+          <div
+            className="size-8 rounded-full bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0"
+            title={quickMessage.author.fullName || quickMessage.author.username || quickMessage.author.email || ''}
+          >
+            {getInitials(quickMessage.author)}
+          </div>
+        ) : (
+          <div className="size-8 rounded-full bg-zinc-100 shrink-0" />
+        )}
         <div className="flex-1 min-w-0">
           {quickMessage ? (
             animEffect === 'scramble' ? (

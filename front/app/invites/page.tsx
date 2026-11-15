@@ -7,6 +7,7 @@ import { createApi } from '@/lib/api'
 import type { InviteResponse, InviteStatus } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Check, X, Trash2, Mail, Send } from 'lucide-react'
+import type { ClerkUser } from '@/app/api/users/route'
 
 const STATUS_STYLES: Record<InviteStatus, string> = {
   PENDING: 'bg-yellow-100 text-yellow-700',
@@ -31,6 +32,18 @@ export default function InvitesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actioning, setActioning] = useState<number | null>(null)
+  const [userMap, setUserMap] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    fetch('/api/users')
+      .then(r => r.json())
+      .then((users: ClerkUser[]) => {
+        const map: Record<string, string> = {}
+        users.forEach(u => { map[u.id] = u.name || u.email })
+        setUserMap(map)
+      })
+      .catch(() => {})
+  }, [])
 
   const getApi = useCallback(async () => {
     const token = await getToken()
@@ -163,9 +176,9 @@ export default function InvitesPage() {
                   </div>
                   <div className="text-xs text-zinc-400 space-y-0.5">
                     {tab === 'received' ? (
-                      <p>De: <span className="font-mono">{invite.inviterId}</span></p>
+                      <p>De: <span className="font-medium text-zinc-600">{userMap[invite.inviterId] ?? invite.inviterId}</span></p>
                     ) : (
-                      <p>Para: <span className="font-mono">{invite.inviteeId}</span></p>
+                      <p>Para: <span className="font-medium text-zinc-600">{userMap[invite.inviteeId] ?? invite.inviteeId}</span></p>
                     )}
                     <p>Enviado: {formatDate(invite.createdAt)} · Expira: {formatDate(invite.expiresAt)}</p>
                     {invite.respondedAt && (

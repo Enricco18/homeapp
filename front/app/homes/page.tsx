@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { createApi } from '@/lib/api'
 import type { HomeResponse } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { ShoppingCart, Package, Users, Plus, Pencil, Trash2, ChevronRight } from 'lucide-react'
+import { Package, Users, Plus, Pencil, Trash2, ChevronRight, MoreHorizontal } from 'lucide-react'
 
 function Modal({ open, onClose, title, children }: {
   open: boolean
@@ -174,31 +174,29 @@ export default function HomesPage() {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Link
-                  href={`/homes/${home.id}/grocery-list`}
-                  className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border hover:bg-zinc-50 transition-colors"
-                >
-                  <ShoppingCart className="size-4 text-zinc-500" />
-                  Lista de compras
-                  <ChevronRight className="size-3 text-zinc-400" />
-                </Link>
-                <Link
-                  href={`/homes/${home.id}/items`}
-                  className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border hover:bg-zinc-50 transition-colors"
-                >
-                  <Package className="size-4 text-zinc-500" />
-                  Itens
-                  <ChevronRight className="size-3 text-zinc-400" />
-                </Link>
+              <div className="flex items-center gap-2">
                 <Link
                   href={`/homes/${home.id}`}
-                  className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-lg bg-zinc-900 text-white hover:bg-zinc-700 transition-colors font-medium"
                 >
-                  <Users className="size-4 text-zinc-500" />
-                  Membros
-                  <ChevronRight className="size-3 text-zinc-400" />
+                  Entrar
+                  <ChevronRight className="size-3.5" />
                 </Link>
+                <div className="relative group">
+                  <button className="size-8 rounded-lg border flex items-center justify-center hover:bg-zinc-50 transition-colors">
+                    <MoreHorizontal className="size-4 text-zinc-500" />
+                  </button>
+                  <div className="absolute left-0 top-full mt-1 w-44 bg-white border rounded-xl shadow-lg overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible -translate-y-1 group-hover:translate-y-0 transition-all duration-150 z-10">
+                    <Link href={`/homes/${home.id}/items`} className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-zinc-50 transition-colors">
+                      <Package className="size-4 text-zinc-500 shrink-0" />
+                      Catálogo de Itens
+                    </Link>
+                    <Link href={`/homes/${home.id}/members`} className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-zinc-50 transition-colors border-t">
+                      <Users className="size-4 text-zinc-500 shrink-0" />
+                      Membros
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
