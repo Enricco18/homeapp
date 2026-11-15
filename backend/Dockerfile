@@ -8,7 +8,7 @@ RUN ./gradlew bootJar --no-daemon -q
 
 FROM eclipse-temurin:22-jre AS runner
 WORKDIR /app
-RUN addgroup --system --gid 1001 spring && adduser --system --uid 1001 --ingroup spring spring
+RUN groupadd --system --gid 1001 spring && useradd --system --uid 1001 --gid spring spring
 COPY --from=builder /app/build/libs/*.jar app.jar
 USER spring
 EXPOSE 8080

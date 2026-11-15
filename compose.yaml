@@ -6,43 +6,40 @@ services:
     volumes:
       - /dev/net/tun:/dev/net/tun
       - tailscale-state:/var/lib/tailscale
+      - ./tailscale/serve.json:/config/serve.json:ro
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_HOSTNAME=home-app
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
-    ports:
-      - "3000:3000"
+      - TS_SERVE_CONFIG=/config/serve.json
     networks:
       - app-net
     restart: unless-stopped
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    networks:
-      - app-net
+    image: ghcr.io/enricco18/home-app-backend:latest
+    platform: linux/amd64
+    network_mode: "service:tailscale"
     environment:
       - DB_URL=jdbc:postgresql://db:5432/homeapp
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - CLERK_ISSUER_URI=${CLERK_ISSUER_URI}
       - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
-      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      - CORS_ALLOWED_ORIGINS=https://home-app.chimaera-climb.ts.net
     depends_on:
+      tailscale:
+        condition: service_started
       db:
         condition: service_healthy
     restart: unless-stopped
 
   front:
-    build:
-      context: ./front
-      dockerfile: Dockerfile
+    image: ghcr.io/enricco18/home-app-front:latest
+    platform: linux/amd64
     network_mode: "service:tailscale"
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8080
-      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
       - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
     depends_on:
       tailscale:
@@ -66,7 +63,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
     restart: unless-stopped
 
 networks:
