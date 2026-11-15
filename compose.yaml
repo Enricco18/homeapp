@@ -18,6 +18,9 @@ services:
     volumes:
       - tailscale-state:/var/lib/tailscale
       - ./tailscale/serve.json:/config/serve.json:ro
+    configs:
+      - source: ts_serve
+        target: /config/serve.json
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_HOSTNAME=home-app
