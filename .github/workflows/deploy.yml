@@ -49,7 +49,7 @@ jobs:
           push: true
           tags: ghcr.io/enricco18/home-app-front:latest
           build-args: |
-            NEXT_PUBLIC_API_URL=https://home-app.chimaera-climb.ts.net:8443
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
   deploy:
