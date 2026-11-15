@@ -1,17 +1,28 @@
+configs:
+  ts_serve:
+    content: |
+      {
+        "TCP": { "443": { "HTTPS": true } },
+        "Web": {
+          "$${TS_CERT_DOMAIN}:443": {
+            "Handlers": {
+              "/":     { "Proxy": "http://front:3000" },
+              "/api/": { "Proxy": "http://backend:8080" }
+            }
+          }
+        }
+      }
 services:
   tailscale:
     image: tailscale/tailscale
-    cap_add:
-      - NET_ADMIN
     volumes:
-      - /dev/net/tun:/dev/net/tun
       - tailscale-state:/var/lib/tailscale
       - ./tailscale/serve.json:/config/serve.json:ro
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_HOSTNAME=home-app
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_USERSPACE=false
+      - TS_USERSPACE=true
       - TS_SERVE_CONFIG=/config/serve.json
     networks:
       - app-net
